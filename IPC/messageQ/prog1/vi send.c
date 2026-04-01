@@ -10,14 +10,15 @@ struct msg_buf {
 int main() {
     key_t key = ftok("progfile", 65);
     int msgid = msgget(key, 0666 | IPC_CREAT);
-    printf("Receiver: Waiting for data...\n");
 
-    msgrcv(msgid, &message, sizeof(message.value), 1, 0);
+    printf("Sender: Enter a number: ");
+    scanf("%d", &message.value);
 
-    int squared = message.value * message.value;
-    printf("Receiver: Processed %d to %d\n", message.value, squared);
-
-    message.msg_type = 2;
-    message.value = squared;
+    message.msg_type = 1;
     msgsnd(msgid, &message, sizeof(message.value), 0);
+
+    msgrcv(msgid, &message, sizeof(message.value), 2, 0);
+    printf("Sender: Received result: %d\n", message.value);
+
+    msgctl(msgid, IPC_RMID, NULL);
 }
